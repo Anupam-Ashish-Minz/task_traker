@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+
+    <style>
+      body {
+        color: white;
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>List of Tasks</h1>
+    <ol>
+      {{range .}}
+      <li>{{.Name}}</li>
+      {{end}}
+    </ol>
+  </body>
+</html>
