@@ -5,6 +5,7 @@
     <title></title>
 
     <!-- <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script> -->
+    <script src="/static/htmx.min.js"></script>
 
     <script defer>
       function toggleForm() {
@@ -36,18 +37,6 @@
   </head>
   <body>
     <h1>List of Tasks</h1>
-    <button hx-get="/">aoeuaoeu</button>
-    <button onclick="toggleForm()" id="toggle-add-task-button">add task</button>
-    <form hx-post="/add" id="add-task-form" action="" method="post">
-      <input type="text" name="name" />
-      <input type="number" name="hours_alloted" style="width: 3rem" />
-      <button>add task</button>
-    </form>
-    <hr />
-    <ol>
-      {{range .}}
-      <li>{{.Name}}</li>
-      {{end}}
-    </ol>
+    {{template "taskbody.html" .}}
   </body>
 </html>

@@ -23,10 +23,39 @@ type Task struct {
 	HoursCompleted float32
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("index.html")
+func getTaskBody() (*template.Template, error) {
+	tmpl, err := template.ParseFiles("templates/taskbody.html")
 	if err != nil {
 		log.Println(err)
+	}
+
+	db, err := sql.Open(DB_TYPE, DB_NAME)
+	defer db.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.Query(`select id, name, time_started, hours_alloted, hours_completed from tasks`)
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	tasks := make([]Task, 0)
+	for rows.Next() {
+		var task Task
+		rows.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
+		tasks = append(tasks, task)
+	}
+	return tmpl, nil
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("templates/index.html", "templates/taskbody.html")
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	db, err := sql.Open(DB_TYPE, DB_NAME)
@@ -53,6 +82,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.Execute(w, tasks)
+	// w.Write([]byte("hello world"))
 }
 
 func addTask(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +123,14 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", index)
+	staticDir := http.StripPrefix(
+		"/static/",
+		http.FileServer(http.Dir("./static")),
+	)
+
+	http.Handle("/static/", staticDir)
 	http.HandleFunc("/add", addTask)
+	http.HandleFunc("/", index)
+
 	http.ListenAndServe(":4000", nil)
 }
