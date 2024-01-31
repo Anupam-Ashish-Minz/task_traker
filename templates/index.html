@@ -37,13 +37,13 @@
   </head>
   <body>
     <h1>List of Tasks</h1>
-  <form hx-post="/add" hx-swap="outerHTML">
+  <form hx-post="/add" hx-swap="beforeend" hx-target="#taskbody">
     <input type="text" name="name" />
     <input type="number" name="hours_alloted" style="width: 3rem" />
     <button>add task</button>
   </form>
   <hr />
-  <ol>
+  <ol id="taskbody">
     {{range .}}
       {{template "taskbody.html" .}}
     {{end}}
