@@ -23,12 +23,7 @@ type Task struct {
 	HoursCompleted float32
 }
 
-func getTaskBody() (*template.Template, error) {
-	tmpl, err := template.ParseFiles("templates/taskbody.html")
-	if err != nil {
-		log.Println(err)
-	}
-
+func getTasks() ([]Task, error) {
 	db, err := sql.Open(DB_TYPE, DB_NAME)
 	defer db.Close()
 	if err != nil {
@@ -47,7 +42,7 @@ func getTaskBody() (*template.Template, error) {
 		rows.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
 		tasks = append(tasks, task)
 	}
-	return tmpl, nil
+	return tasks, nil
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -58,31 +53,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := sql.Open(DB_TYPE, DB_NAME)
-	defer db.Close()
+	tasks, err := getTasks()
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	}
-
-	rows, err := db.Query(`select id, name, time_started, hours_alloted, hours_completed from tasks`)
-	defer rows.Close()
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	tasks := make([]Task, 0)
-	for rows.Next() {
-		var task Task
-		rows.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
-		tasks = append(tasks, task)
 	}
 
 	tmpl.Execute(w, tasks)
-	// w.Write([]byte("hello world"))
 }
 
 func addTask(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +97,14 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	res.LastInsertId()
+	taskID, _ := res.LastInsertId()
+
+	row := db.QueryRow(`select id, name, time_started, hours_alloted, hours_completed from tasks where id = ?`, taskID)
+	var task Task
+	row.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
+
+	tmpl, err := template.ParseFiles("templates/taskbody.html")
+	tmpl.Execute(w, task)
 }
 
 func main() {

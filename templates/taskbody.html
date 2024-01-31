@@ -1,11 +1,1 @@
-<form hx-post="/add" hx-swap="outerHTML">
-  <input type="text" name="name" />
-  <input type="number" name="hours_alloted" style="width: 3rem" />
-  <button>add task</button>
-</form>
-<hr />
-<ol>
-  {{range .}}
-  <li>{{.Name}}</li>
-  {{end}}
-</ol>
+<li>{{.Name}}</li>
