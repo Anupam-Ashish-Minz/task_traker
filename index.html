@@ -8,14 +8,13 @@
 
     <script defer>
       function toggleForm() {
-        console.log("triggered");
         const form = document.getElementById("add-task-form");
         const toggleSwitch = document.getElementById("toggle-add-task-button");
-        if (form.style.opacity == 0) {
-          form.style.opacity = 1;
+        if (form.style.display == "none" || form.style.display == "") {
+          form.style.display = "flex";
           toggleSwitch.innerText = "cancel";
         } else {
-          form.style.opacity = 0;
+          form.style.display = "none";
           toggleSwitch.innerText = "add task";
         }
       }
@@ -31,6 +30,7 @@
         margin: 2rem;
         padding: 2rem;
         border: 1px solid white;
+        display: none;
       }
     </style>
   </head>
