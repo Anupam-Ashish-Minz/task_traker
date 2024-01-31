@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -54,7 +55,45 @@ func index(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, tasks)
 }
 
+func addTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("invalid add task request")
+		return
+	}
+
+	log.Println("add task request")
+
+	name := r.PostFormValue("name")
+	hours_alloted := r.PostFormValue("hours_alloted")
+	time_started := time.Now().Format(time.RFC3339)
+	hours_completed := 0
+
+	if name == "" || hours_alloted == "" || hours_alloted == "0" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	db, err := sql.Open(DB_TYPE, DB_NAME)
+	defer db.Close()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	res, err := db.Exec(`insert into tasks (name, time_started, hours_alloted, hours_completed) values (?, ?, ?, ?)`,
+		name, time_started, hours_alloted, hours_completed)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	res.LastInsertId()
+}
+
 func main() {
 	http.HandleFunc("/", index)
+	http.HandleFunc("/add", addTask)
 	http.ListenAndServe(":4000", nil)
 }

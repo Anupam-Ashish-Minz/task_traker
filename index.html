@@ -4,15 +4,46 @@
     <meta charset="UTF-8" />
     <title></title>
 
+    <!-- <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script> -->
+
+    <script defer>
+      function toggleForm() {
+        console.log("triggered");
+        const form = document.getElementById("add-task-form");
+        const toggleSwitch = document.getElementById("toggle-add-task-button");
+        if (form.style.opacity == 0) {
+          form.style.opacity = 1;
+          toggleSwitch.innerText = "cancel";
+        } else {
+          form.style.opacity = 0;
+          toggleSwitch.innerText = "add task";
+        }
+      }
+    </script>
+
     <style>
       body {
         color: white;
         background-color: black;
       }
+
+      #add-task-form {
+        margin: 2rem;
+        padding: 2rem;
+        border: 1px solid white;
+      }
     </style>
   </head>
   <body>
     <h1>List of Tasks</h1>
+    <button hx-get="/">aoeuaoeu</button>
+    <button onclick="toggleForm()" id="toggle-add-task-button">add task</button>
+    <form hx-post="/add" id="add-task-form" action="" method="post">
+      <input type="text" name="name" />
+      <input type="number" name="hours_alloted" style="width: 3rem" />
+      <button>add task</button>
+    </form>
+    <hr />
     <ol>
       {{range .}}
       <li>{{.Name}}</li>
