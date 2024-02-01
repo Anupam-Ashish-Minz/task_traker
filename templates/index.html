@@ -35,12 +35,19 @@
       }
 
       td, th {
-        padding: 0rem 2rem;
+        padding: 0.25rem 2rem;
       }
 
       .hours {
         display: flex;
         justify-content: space-between;
+      }
+
+      table button {
+        color: white;
+        background-color: black;
+        border: 1px solid white;
+        border-radius: 1rem;
       }
     </style>
   </head>
@@ -56,6 +63,7 @@
       <th>Index</th>
       <th>Task</th>
       <th>Hours Alloted</th>
+      <th>Completed Today</th>
       {{range .}} {{template "taskbody.html" .}} {{end}}
     </table>
   </body>
