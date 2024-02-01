@@ -4,22 +4,7 @@
     <meta charset="UTF-8" />
     <title></title>
 
-    <!-- <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script> -->
     <script src="/static/htmx.min.js"></script>
-
-    <script defer>
-      function toggleForm() {
-        const form = document.getElementById("add-task-form");
-        const toggleSwitch = document.getElementById("toggle-add-task-button");
-        if (form.style.display == "none" || form.style.display == "") {
-          form.style.display = "flex";
-          toggleSwitch.innerText = "cancel";
-        } else {
-          form.style.display = "none";
-          toggleSwitch.innerText = "add task";
-        }
-      }
-    </script>
 
     <style>
       body {
