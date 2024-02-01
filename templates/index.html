@@ -33,6 +33,15 @@
         border: 1px solid white;
         display: none;
       }
+
+      td, th {
+        padding: 0rem 2rem;
+      }
+
+      .hours {
+        display: flex;
+        justify-content: space-between;
+      }
     </style>
   </head>
   <body>
@@ -43,7 +52,10 @@
       <button>add task</button>
     </form>
     <hr />
-    <table>
+    <table border="1">
+      <th>Index</th>
+      <th>Task</th>
+      <th>Hours Alloted</th>
       {{range .}} {{template "taskbody.html" .}} {{end}}
     </table>
   </body>

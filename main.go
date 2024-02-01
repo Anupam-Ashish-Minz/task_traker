@@ -17,6 +17,7 @@ const (
 
 type Task struct {
 	ID             int
+	Index          int
 	Name           string
 	TimeStarted    string
 	HoursAlloted   float32
@@ -37,9 +38,12 @@ func getTasks() ([]Task, error) {
 	}
 
 	tasks := make([]Task, 0)
+	index := 1
 	for rows.Next() {
 		var task Task
 		rows.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
+		task.Index = index
+		index += 1
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
