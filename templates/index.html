@@ -10,7 +10,9 @@
       function computeIndex() {
         const rows = document.querySelectorAll("tr > td:nth-child(1)");
         for (let [i, x] of rows.entries()) {
-          x.innerHTML = i + 1;
+          if (isNaN(parseInt(x.innerText))) {
+            x.innerText = i + 1;
+          } 
         }
       }
 
