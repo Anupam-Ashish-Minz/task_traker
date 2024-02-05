@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -22,6 +24,7 @@ type Task struct {
 	TimeStarted    string
 	HoursAlloted   float32
 	HoursCompleted float32
+	HoursRemaining float32
 }
 
 func getTasks() ([]Task, error) {
@@ -44,6 +47,7 @@ func getTasks() ([]Task, error) {
 		rows.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
 		task.Index = index
 		index += 1
+		task.HoursRemaining = task.HoursAlloted - task.HoursCompleted
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
@@ -111,6 +115,47 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, task)
 }
 
+func completeTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("should be a post method"))
+		return
+	}
+	p := strings.Split(r.URL.Path, "/")
+	taskID, err := strconv.Atoi(p[len(p)-1])
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("task id required"))
+		return
+	}
+
+	db, err := sql.Open(DB_TYPE, DB_NAME)
+	defer db.Close()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("failed to connect to database"))
+		return
+	}
+
+	_, err = db.Exec(`update tasks set hours_completed = hours_completed + ? where id = ?`, 1, taskID)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("failed to execute query"))
+		return
+	}
+
+	row := db.QueryRow(`select id, name, time_started, hours_alloted, hours_completed from tasks where id = ?`, taskID)
+	var task Task
+	row.Scan(&task.ID, &task.Name, &task.TimeStarted, &task.HoursAlloted, &task.HoursCompleted)
+	task.HoursRemaining = task.HoursAlloted - task.HoursCompleted
+
+	tmpl, err := template.ParseFiles("templates/taskbody.html")
+	tmpl.Execute(w, task)
+}
+
 func main() {
 	staticDir := http.StripPrefix(
 		"/static/",
@@ -119,6 +164,7 @@ func main() {
 
 	http.Handle("/static/", staticDir)
 	http.HandleFunc("/add", addTask)
+	http.HandleFunc("/task/complete_one_hour/", completeTask)
 	http.HandleFunc("/", index)
 
 	http.ListenAndServe(":4000", nil)

@@ -1,6 +1,7 @@
-<tr>
+<tr id="task-row-{{.ID}}">
   <td> {{.Index}} </td>
   <td> {{.Name}} </td>
   <td class="hours"> {{.HoursAlloted}} <button>edit</button> </td>
-  <td> <button>+1h</button> </td>
+  <td> {{.HoursRemaining}} </td>
+  <td> <button hx-post="/task/complete_one_hour/{{.ID}}" hx-target="#task-row-{{.ID}}" hx-swap="outerHTML">1h</button> </td>
 </tr>
