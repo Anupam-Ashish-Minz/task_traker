@@ -6,6 +6,24 @@
 
     <script src="/static/htmx.min.js"></script>
 
+    <script>
+      function computeIndex() {
+        const rows = document.querySelectorAll("tr > td:nth-child(1)");
+        for (let [i, x] of rows.entries()) {
+          x.innerHTML = i + 1;
+        }
+      }
+
+      window.onload = () => {
+        document.body.addEventListener('htmx:load', (event) => {
+          computeIndex();
+        });
+        computeIndex();
+      }
+
+    </script>
+
+
     <style>
       body {
         color: white;
